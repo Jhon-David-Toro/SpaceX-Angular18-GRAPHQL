@@ -1,0 +1,108 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-xl);
+}
+
+.orbit {
+  margin: 0;
+
+  svg {
+    inline-size: 100%;
+    block-size: auto;
+    max-block-size: 34rem;
+  }
+
+  figcaption {
+    margin-block-start: var(--space-s);
+    color: var(--titanium);
+    font-size: var(--step--1);
+    max-width: var(--measure);
+  }
+}
+
+.ref {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 0.008;
+  stroke-dasharray: 0.03 0.03;
+}
+
+.earth {
+  stroke: var(--titanium);
+}
+
+.path {
+  fill: none;
+  stroke: var(--foil-mark);
+  stroke-width: 0.018;
+}
+
+.sun {
+  fill: var(--foil-mark);
+  filter: drop-shadow(0 0 0.06px var(--foil-mark));
+}
+
+.apsis {
+  fill: var(--frost);
+}
+
+.label {
+  fill: var(--frost);
+  font-size: 0.09px;
+  font-weight: 600;
+  dominant-baseline: middle;
+
+  &.soft {
+    fill: var(--titanium);
+  }
+}
+
+.data {
+  display: grid;
+  gap: var(--space-m);
+
+  a {
+    color: var(--foil-ink);
+    font-weight: 600;
+  }
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-block-start: 1px solid var(--line);
+
+  > div {
+    display: grid;
+    padding-block: var(--space-xs);
+    border-block-end: 1px solid var(--line);
+  }
+
+  dt {
+    color: var(--titanium);
+    font-size: var(--step--1);
+  }
+
+  dd {
+    font-size: var(--step-2);
+    font-weight: 700;
+    font-stretch: var(--semi-wide);
+  }
+}
+
+.note {
+  color: var(--titanium);
+  font-size: var(--step--1);
+}
+
+.details {
+  max-width: var(--measure);
+}
+
+@media (width < 56rem) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

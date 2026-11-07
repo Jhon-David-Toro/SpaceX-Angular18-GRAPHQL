@@ -1,0 +1,90 @@
+<div class="page">
+  <section class="hero" aria-labelledby="hero-title">
+    <h1 id="hero-title">Cada línea es un despegue.</h1>
+    @if (store.resource.hasValue()) {
+      <p class="lede">
+        {{ stats().total }} lanzamientos de SpaceX entre {{ stats().firstYear }} y
+        {{ stats().lastYear }}: del Falcon 1 que no llegó a órbita a los Falcon 9 que aterrizan y
+        vuelven a volar. Pasa el cursor, o usa las flechas, para recorrerlos.
+      </p>
+      <app-launch-cadence [launches]="store.launches()" />
+    } @else {
+      <p class="lede">El registro completo de vuelos de SpaceX, lanzamiento a lanzamiento.</p>
+      <app-resource-status
+        [resource]="store.resource"
+        subject="los lanzamientos"
+        [rows]="[100, 100, 100]"
+      />
+    }
+  </section>
+
+  @if (store.resource.hasValue()) {
+    <dl class="facts" aria-label="Resumen del archivo">
+      <div>
+        <dt>Misiones con éxito</dt>
+        <dd class="num">{{ stats().successRate | ratio }}</dd>
+      </div>
+      <div>
+        <dt>Fallos registrados</dt>
+        <dd class="num">{{ stats().failures }}</dd>
+      </div>
+      @if (stats().busiestYear; as busiest) {
+        <div>
+          <dt>Año con más vuelos</dt>
+          <dd class="num">
+            {{ busiest.year }} <span class="soft">({{ busiest.count }})</span>
+          </dd>
+        </div>
+      }
+      <div>
+        <dt>Carga útil lanzada</dt>
+        <dd class="num">{{ totalPayload() | mass: units() }}</dd>
+      </div>
+    </dl>
+
+    @if (latest(); as l) {
+      <section class="latest" aria-labelledby="latest-title">
+        @if (l.image) {
+          <div class="latest-media">
+            <img [ngSrc]="l.image" fill sizes="(width < 48rem) 100vw, 36rem" alt="" />
+          </div>
+        }
+        <div class="latest-text">
+          <h2 id="latest-title">Último vuelo del registro</h2>
+          <p class="latest-name">{{ l.name }}</p>
+          <p class="soft">
+            {{ l.date | date: 'longDate' : 'UTC' }} desde {{ l.site }}, a bordo de un
+            {{ l.rocket }}.
+          </p>
+          <app-outcome-badge [outcome]="l.outcome" />
+          @if (l.details) {
+            <p class="latest-details">{{ l.details }}</p>
+          }
+          <a class="button" data-variant="primary" [routerLink]="['/lanzamientos', l.id]"
+            >Abrir la misión</a
+          >
+        </div>
+      </section>
+    }
+  }
+
+  <section class="explore" aria-labelledby="explore-title">
+    <h2 id="explore-title">Explora el archivo</h2>
+    <ul>
+      @for (d of destinations; track d.path) {
+        <li>
+          <a [routerLink]="d.path">
+            <span class="dest-title">{{ d.title }}</span>
+            <span class="soft">{{ d.text }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+
+  @defer (on viewport) {
+    <app-company-facts />
+  } @placeholder {
+    <div class="company-placeholder" aria-hidden="true"></div>
+  }
+</div>

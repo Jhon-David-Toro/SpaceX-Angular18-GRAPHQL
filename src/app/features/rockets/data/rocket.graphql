@@ -1,0 +1,56 @@
+query Rockets {
+  rockets {
+    id
+    name
+    type
+    active
+    stages
+    boosters
+    cost_per_launch
+    success_rate_pct
+    first_flight
+    country
+    company
+    description
+    wikipedia
+    height {
+      meters
+      feet
+    }
+    diameter {
+      meters
+      feet
+    }
+    mass {
+      kg
+      lb
+    }
+    engines {
+      number
+      type
+      version
+      propellant_1
+      propellant_2
+      thrust_sea_level {
+        kN
+        lbf
+      }
+    }
+    payload_weights {
+      id
+      name
+      kg
+      lb
+    }
+    first_stage {
+      reusable
+      engines
+      fuel_amount_tons
+      burn_time_sec
+    }
+    landing_legs {
+      number
+      material
+    }
+  }
+}

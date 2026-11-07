@@ -1,0 +1,16 @@
+query History {
+  histories {
+    id
+    title
+    event_date_utc
+    details
+    links {
+      article
+      wikipedia
+    }
+    flight {
+      id
+      mission_name
+    }
+  }
+}

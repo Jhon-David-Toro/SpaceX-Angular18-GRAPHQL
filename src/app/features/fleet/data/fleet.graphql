@@ -1,0 +1,21 @@
+query Fleet {
+  ships {
+    id
+    name
+    type
+    roles
+    active
+    home_port
+    year_built
+    image
+    url
+    successful_landings
+    attempted_landings
+    weight_kg
+    weight_lbs
+    missions {
+      name
+      flight
+    }
+  }
+}

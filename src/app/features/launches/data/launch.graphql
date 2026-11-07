@@ -1,0 +1,104 @@
+query LaunchArchive {
+  launchesPast(limit: 500, sort: "launch_date_utc", order: "desc") {
+    id
+    mission_name
+    launch_date_utc
+    launch_success
+    details
+    launch_site {
+      site_id
+      site_name
+    }
+    rocket {
+      rocket_name
+      second_stage {
+        payloads {
+          id
+          payload_mass_kg
+          orbit
+        }
+      }
+    }
+    links {
+      mission_patch_small
+      flickr_images
+    }
+  }
+}
+
+query LaunchDetail($id: ID!) {
+  launch(id: $id) {
+    id
+    mission_name
+    launch_date_utc
+    launch_success
+    details
+    launch_site {
+      site_id
+      site_name
+      site_name_long
+    }
+    links {
+      article_link
+      video_link
+      wikipedia
+      presskit
+      mission_patch
+      flickr_images
+    }
+    rocket {
+      rocket_name
+      rocket_type
+      rocket {
+        id
+      }
+      first_stage {
+        cores {
+          flight
+          block
+          reused
+          land_success
+          landing_intent
+          landing_type
+          landing_vehicle
+          core {
+            id
+            status
+            reuse_count
+          }
+        }
+      }
+      second_stage {
+        block
+        payloads {
+          id
+          payload_type
+          payload_mass_kg
+          payload_mass_lbs
+          orbit
+          nationality
+          manufacturer
+          customers
+          reused
+          orbit_params {
+            regime
+            periapsis_km
+            apoapsis_km
+            inclination_deg
+            period_min
+          }
+        }
+      }
+      fairings {
+        reused
+        recovery_attempt
+        recovered
+      }
+    }
+    ships {
+      id
+      name
+      image
+    }
+  }
+}

@@ -1,0 +1,25 @@
+query Company {
+  company {
+    name
+    founder
+    founded
+    employees
+    vehicles
+    launch_sites
+    test_sites
+    ceo
+    cto
+    coo
+    valuation
+    summary
+    headquarters {
+      city
+      state
+    }
+    links {
+      website
+      flickr
+      twitter
+    }
+  }
+}

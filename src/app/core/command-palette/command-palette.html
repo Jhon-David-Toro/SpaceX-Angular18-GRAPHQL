@@ -1,0 +1,59 @@
+<!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+<dialog #dialog aria-labelledby="palette-title" (click)="onDialogClick($event)">
+  <div class="panel">
+    <h2 id="palette-title" class="visually-hidden">Buscar en el archivo</h2>
+    <div class="field">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="8.5" cy="8.5" r="5.5" />
+        <path d="m13 13 4 4" />
+      </svg>
+      <input
+        type="text"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="true"
+        aria-controls="palette-results"
+        [attr.aria-activedescendant]="activeId()"
+        aria-label="Busca una misión, un cohete o una sección"
+        placeholder="Busca una misión, un cohete o una sección"
+        autocomplete="off"
+        spellcheck="false"
+        [formField]="search.query"
+        (keydown)="onKeydown($event)"
+      />
+      <button type="button" class="close" (click)="close()">Cerrar</button>
+    </div>
+
+    <ul id="palette-results" role="listbox" aria-label="Resultados">
+      @for (item of results(); track item.id; let i = $index) {
+        <!-- Options are reached with the arrow keys from the combobox, so they are not tab stops. -->
+        <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+        <li
+          role="option"
+          [id]="item.id"
+          [attr.aria-selected]="i === activeIndex()"
+          (click)="go(item)"
+          (mousemove)="activeIndex.set(i)"
+        >
+          <span class="label">{{ item.label }}</span>
+          @if (item.hint; as hint) {
+            <span class="hint">{{ hint | date: 'mediumDate' : 'UTC' }}</span>
+          }
+          <span class="kind">{{ item.kind }}</span>
+        </li>
+      } @empty {
+        <li class="empty" role="presentation">
+          @if (loading()) {
+            Cargando el archivo de misiones…
+          } @else {
+            Ningún resultado. Prueba con el nombre de una misión, como «CRS-20».
+          }
+        </li>
+      }
+    </ul>
+
+    <p class="help" aria-hidden="true">
+      <kbd>↑</kbd><kbd>↓</kbd> para moverte, <kbd>Enter</kbd> para abrir, <kbd>Esc</kbd> para salir
+    </p>
+  </div>
+</dialog>

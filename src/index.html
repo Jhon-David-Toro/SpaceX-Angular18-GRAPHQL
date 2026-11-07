@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Archivo de misiones SpaceX</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Explora cada lanzamiento de SpaceX entre 2006 y 2022: cadencia, cohetes, flota de recuperación y el Roadster en órbita solar."
+    />
+    <meta name="theme-color" content="#0f1c30" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Archivo de misiones SpaceX" />
+    <meta
+      property="og:description"
+      content="Cada lanzamiento de SpaceX, explorable: cadencia, cohetes, flota y Starman."
+    />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://spacex-production.up.railway.app" crossorigin />
+    <script>
+      // Apply the stored theme before first paint to avoid a flash.
+      try {
+        const theme = localStorage.getItem('pref:theme');
+        if (theme === '"light"' || theme === '"dark"') {
+          document.documentElement.dataset.theme = JSON.parse(theme);
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <app-root>
+      <noscript>Esta aplicación necesita JavaScript para consultar la API de SpaceX.</noscript>
+    </app-root>
+  </body>
+</html>

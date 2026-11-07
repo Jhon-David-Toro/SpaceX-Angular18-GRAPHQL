@@ -1,0 +1,138 @@
+<div class="page">
+  <header class="page-intro">
+    <h1>Cohetes</h1>
+    <p>
+      Los cuatro vehículos de SpaceX dibujados a la misma escala, junto a la Estatua de la Libertad.
+      Elige uno para ver su ficha.
+    </p>
+  </header>
+
+  <app-resource-status [resource]="resource" subject="los cohetes" />
+
+  @if (rockets().length) {
+    <figure class="lineup">
+      <svg [attr.viewBox]="viewBox" role="img" aria-labelledby="lineup-caption">
+        <line class="statue" x1="0" [attr.x2]="width" [attr.y1]="statueY()" [attr.y2]="statueY()" />
+        <text class="statue-label" x="4" [attr.y]="statueY() - 6">
+          Estatua de la Libertad, 93 m
+        </text>
+        @for (s of lineup().silhouettes; track s.id) {
+          <!-- Pointer shortcut only; the tab list below is the accessible control. -->
+
+          <path
+            class="body"
+            [class.is-selected]="s.id === selectedId()"
+            [attr.d]="s.path"
+            (click)="select(s.id)"
+          />
+        }
+        <line class="ground" x1="0" [attr.x2]="width" [attr.y1]="baseline" [attr.y2]="baseline" />
+      </svg>
+      <figcaption id="lineup-caption" class="visually-hidden">
+        Comparación de alturas a escala:
+        @for (r of rockets(); track r.id) {
+          {{ r.name }} {{ r.height | length: units() }}.
+        }
+      </figcaption>
+    </figure>
+
+    <div ngTabs>
+      <ul
+        ngTabList
+        class="picker"
+        [selectedTab]="selectedId()"
+        (selectedTabChange)="select($event)"
+        aria-label="Cohete"
+      >
+        @for (r of rockets(); track r.id) {
+          <li ngTab [value]="r.id">
+            <span class="pick-name">{{ r.name }}</span>
+            <span class="pick-meta num">{{ r.height | length: units() }}</span>
+          </li>
+        }
+      </ul>
+
+      @for (r of rockets(); track r.id) {
+        <div ngTabPanel [value]="r.id" class="panel">
+          <ng-template ngTabContent>
+            <div class="sheet">
+              <div class="intro">
+                <h2>{{ r.name }}</h2>
+                <p class="status">{{ status(r.active, r.firstFlight) }}</p>
+                @if (r.description) {
+                  <p class="description">{{ r.description }}</p>
+                }
+                @if (r.wikipedia) {
+                  <a [href]="r.wikipedia" target="_blank" rel="noopener"
+                    >Leer en Wikipedia<span class="visually-hidden">
+                      (se abre en otra pestaña)</span
+                    ></a
+                  >
+                }
+              </div>
+
+              <dl class="specs">
+                <div>
+                  <dt>Altura</dt>
+                  <dd class="num">{{ r.height | length: units() }}</dd>
+                </div>
+                <div>
+                  <dt>Diámetro</dt>
+                  <dd class="num">{{ r.diameter | length: units() }}</dd>
+                </div>
+                <div>
+                  <dt>Masa al despegue</dt>
+                  <dd class="num">{{ r.mass | mass: units() }}</dd>
+                </div>
+                <div>
+                  <dt>Etapas</dt>
+                  <dd class="num">{{ r.stages ?? '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Motores (1.ª etapa)</dt>
+                  <dd>{{ engines(r.engineCount, r.engineName) }}</dd>
+                </div>
+                <div>
+                  <dt>Propelentes</dt>
+                  <dd>{{ r.propellants.join(' y ') || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Coste por lanzamiento</dt>
+                  <dd class="num">{{ r.costPerLaunch | usd }}</dd>
+                </div>
+                <div>
+                  <dt>Tasa de éxito</dt>
+                  <dd class="num">{{ r.successRate | ratio }}</dd>
+                </div>
+                <div>
+                  <dt>Primera etapa reutilizable</dt>
+                  <dd>{{ r.reusable ? 'Sí' : 'No' }}</dd>
+                </div>
+              </dl>
+
+              @if (r.capacities.length) {
+                <section class="capacity" [attr.aria-labelledby]="'cap-' + r.id">
+                  <h3 [id]="'cap-' + r.id">Capacidad de carga por destino</h3>
+                  <p class="hint">
+                    La barra compara con el cohete más capaz de la familia para ese destino.
+                  </p>
+                  <ul>
+                    @for (c of r.capacities; track c.id) {
+                      <li>
+                        <span class="cap-name">{{ c.name }}</span>
+                        <span class="cap-bar" aria-hidden="true"
+                          ><span [style.inline-size.%]="capacityShare(c.id, c.mass.metric)"></span
+                        ></span>
+                        <span class="cap-value num">{{ c.mass | mass: units() }}</span>
+                      </li>
+                    }
+                  </ul>
+                </section>
+              }
+            </div>
+          </ng-template>
+        </div>
+      }
+    </div>
+  }
+</div>

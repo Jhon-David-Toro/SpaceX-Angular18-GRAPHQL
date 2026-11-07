@@ -1,0 +1,220 @@
+<article class="page">
+  <a class="back" routerLink="/lanzamientos">Todos los lanzamientos</a>
+
+  <app-resource-status [resource]="resource" subject="esta misión" />
+
+  @if (launch(); as l) {
+    <header class="head">
+      @if (l.patch) {
+        <img
+          class="patch"
+          [ngSrc]="l.patch"
+          width="144"
+          height="144"
+          alt="Insignia de la misión"
+          priority
+        />
+      }
+      <div class="title">
+        <h1>{{ l.name }}</h1>
+        <p class="when">
+          <time [attr.datetime]="l.date">{{
+            l.date | date: "EEEE d 'de' MMMM 'de' y, HH:mm 'UTC'" : 'UTC'
+          }}</time>
+        </p>
+        <app-outcome-badge [outcome]="l.outcome" />
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="primary">
+        @if (videoId(); as vid) {
+          <app-video-facade [videoId]="vid" [title]="l.name" />
+        } @else if (cover(); as img) {
+          <div class="cover">
+            <img
+              [ngSrc]="img"
+              fill
+              sizes="(width < 60rem) 100vw, 48rem"
+              priority
+              [alt]="'Fotografía de ' + l.name"
+            />
+          </div>
+        }
+
+        @if (l.details) {
+          <p class="details">{{ l.details }}</p>
+        }
+
+        @if (tabs().length) {
+          <div ngTabs class="tabs">
+            <ul ngTabList [(selectedTab)]="selectedTab" aria-label="Datos de la misión">
+              @for (tab of tabs(); track tab.value) {
+                <li ngTab [value]="tab.value">{{ tab.label }}</li>
+              }
+            </ul>
+
+            <div ngTabPanel value="stage">
+              <ng-template ngTabContent>
+                <table>
+                  <caption class="visually-hidden">
+                    Núcleos de la primera etapa
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Núcleo</th>
+                      <th scope="col">Bloque</th>
+                      <th scope="col">Vuelo</th>
+                      <th scope="col">Aterrizaje</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (core of l.cores; track $index) {
+                      <tr>
+                        <th scope="row">
+                          {{ core.serial }}
+                          @if (core.reused) {
+                            <span class="tag">Reutilizado</span>
+                          }
+                        </th>
+                        <td class="num">{{ core.block ?? '—' }}</td>
+                        <td class="num">{{ core.flight ?? '—' }}</td>
+                        <td>
+                          <span [attr.data-landing]="core.landing">{{
+                            landingText[core.landing]
+                          }}</span>
+                          @if (core.landingVehicle) {
+                            <span class="sub">en {{ core.landingVehicle }}</span>
+                          } @else if (core.landingType) {
+                            <span class="sub">{{ core.landingType }}</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </ng-template>
+            </div>
+
+            <div ngTabPanel value="payload">
+              <ng-template ngTabContent>
+                <ul class="payloads">
+                  @for (p of l.payloads; track p.id) {
+                    <li>
+                      <h3>{{ p.id }}</h3>
+                      <dl class="facts">
+                        <div>
+                          <dt>Tipo</dt>
+                          <dd>{{ p.type ?? '—' }}</dd>
+                        </div>
+                        <div>
+                          <dt>Masa</dt>
+                          <dd class="num">{{ p.mass | mass: units() }}</dd>
+                        </div>
+                        <div>
+                          <dt>Órbita</dt>
+                          <dd>
+                            {{ p.orbit ?? '—' }}
+                            @if (orbitSummary(p.periapsisKm, p.apoapsisKm); as o) {
+                              <span class="sub num">{{ o }}</span>
+                            }
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Cliente</dt>
+                          <dd>{{ p.customers.join(', ') || '—' }}</dd>
+                        </div>
+                        <div>
+                          <dt>Fabricante</dt>
+                          <dd>{{ p.manufacturer ?? '—' }}</dd>
+                        </div>
+                      </dl>
+                    </li>
+                  }
+                </ul>
+              </ng-template>
+            </div>
+
+            <div ngTabPanel value="gallery">
+              <ng-template ngTabContent>
+                <ul class="gallery">
+                  @for (img of l.images; track img; let i = $index) {
+                    <li>
+                      <a [href]="img" target="_blank" rel="noopener">
+                        <img
+                          [ngSrc]="img"
+                          fill
+                          sizes="(width < 40rem) 50vw, 16rem"
+                          [alt]="'Foto ' + (i + 1) + ' de ' + l.name"
+                        />
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </ng-template>
+            </div>
+          </div>
+        }
+      </div>
+
+      <aside class="side" aria-label="Ficha técnica">
+        <dl class="facts stacked">
+          <div>
+            <dt>Cohete</dt>
+            <dd>
+              @if (l.rocketId) {
+                <a routerLink="/cohetes" [queryParams]="{ cohete: l.rocketId }">{{ l.rocket }}</a>
+              } @else {
+                {{ l.rocket }}
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Sitio de lanzamiento</dt>
+            <dd>{{ l.siteLong ?? l.site }}</dd>
+          </div>
+          @if (l.fairingsRecovered !== null) {
+            <div>
+              <dt>Cofia</dt>
+              <dd>{{ l.fairingsRecovered ? 'Recuperada' : 'No recuperada' }}</dd>
+            </div>
+          }
+          @if (l.ships.length) {
+            <div>
+              <dt>Barcos de apoyo</dt>
+              <dd>{{ shipNames() }}</dd>
+            </div>
+          }
+        </dl>
+
+        @if (l.links.length) {
+          <h2 class="side-title">Para leer más</h2>
+          <ul class="links">
+            @for (link of l.links; track link.url) {
+              <li>
+                <a [href]="link.url" target="_blank" rel="noopener">
+                  {{ link.label }}<span class="visually-hidden"> (se abre en otra pestaña)</span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </aside>
+    </div>
+
+    <nav class="pager" aria-label="Misiones contiguas">
+      @if (neighbours().older; as older) {
+        <a class="prev" [routerLink]="['/lanzamientos', older.id]">
+          <span class="dir">Anterior</span>
+          <span class="name">{{ older.name }}</span>
+        </a>
+      }
+      @if (neighbours().newer; as newer) {
+        <a class="next" [routerLink]="['/lanzamientos', newer.id]">
+          <span class="dir">Siguiente</span>
+          <span class="name">{{ newer.name }}</span>
+        </a>
+      }
+    </nav>
+  }
+</article>

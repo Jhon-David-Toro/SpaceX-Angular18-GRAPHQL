@@ -1,0 +1,71 @@
+<figure class="cadence">
+  <!-- The whole chart behaves as one slider; pointer clicks open the hovered launch. -->
+
+  <div
+    class="plot"
+    role="slider"
+    tabindex="0"
+    aria-label="Lanzamientos en el tiempo"
+    [attr.aria-valuemin]="1"
+    [attr.aria-valuemax]="layout().ticks.length"
+    [attr.aria-valuenow]="active() + 1"
+    [attr.aria-valuetext]="valueText()"
+    [attr.aria-describedby]="'cadence-summary'"
+    (keydown)="onKeydown($event)"
+    (pointermove)="onPointerMove($event, svg)"
+    (click)="openActive()"
+  >
+    <svg
+      #svg
+      [attr.viewBox]="'0 0 ' + width + ' ' + (height + 10)"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <line class="baseline" x1="0" [attr.x2]="width" [attr.y1]="height" [attr.y2]="height" />
+      @for (year of layout().years; track year.year) {
+        <line
+          class="year-rule"
+          [attr.x1]="year.x"
+          [attr.x2]="year.x"
+          [attr.y1]="height"
+          [attr.y2]="height + 8"
+        />
+      }
+      @for (tick of layout().ticks; track tick.launch.id; let i = $index) {
+        <line
+          class="tick"
+          [attr.data-outcome]="tick.launch.outcome"
+          [class.is-active]="i === active()"
+          [style.--i]="i"
+          [attr.x1]="tick.x"
+          [attr.x2]="tick.x"
+          [attr.y1]="height"
+          [attr.y2]="height - tick.height"
+        />
+      }
+    </svg>
+    <ol class="years" aria-hidden="true">
+      @for (year of layout().years; track year.year) {
+        <li [style.left.%]="(year.x / width) * 100">
+          {{ year.year }}
+        </li>
+      }
+    </ol>
+  </div>
+
+  <figcaption>
+    <p id="cadence-summary" class="visually-hidden">{{ summary() }}</p>
+    @if (activeTick(); as tick) {
+      <div class="readout" aria-live="polite">
+        <a class="name" [routerLink]="['/lanzamientos', tick.launch.id]">{{ tick.launch.name }}</a>
+        <span class="meta">{{ activeMeta() }}</span>
+        <app-outcome-badge [outcome]="tick.launch.outcome" />
+      </div>
+    }
+    <p class="legend">
+      <span class="key" data-outcome="success"></span>Éxito
+      <span class="key" data-outcome="failure"></span>Fallo
+      <span class="sep">La altura de cada línea indica la masa de carga útil.</span>
+    </p>
+  </figcaption>
+</figure>

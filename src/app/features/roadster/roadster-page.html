@@ -1,0 +1,97 @@
+<div class="page">
+  <header class="page-intro">
+    <h1>Roadster de Starman</h1>
+    <p>
+      Un Tesla Roadster rojo con un maniquí en traje espacial al volante, lanzado como carga de
+      prueba del primer Falcon Heavy. Desde entonces da vueltas al Sol entre la Tierra y Marte.
+    </p>
+  </header>
+
+  <app-resource-status [resource]="resource" subject="los datos del Roadster" />
+
+  @if (roadster(); as r) {
+    <div class="layout">
+      @if (orbit(); as o) {
+        <figure class="orbit">
+          <svg viewBox="-1.9 -1.9 3.8 3.8" role="img" aria-labelledby="orbit-caption">
+            <circle class="ref" cx="0" cy="0" [attr.r]="mars" />
+            <circle class="ref earth" cx="0" cy="0" [attr.r]="earth" />
+            <ellipse
+              class="path"
+              [attr.cx]="o.cx"
+              [attr.cy]="o.cy"
+              [attr.rx]="o.rx"
+              [attr.ry]="o.ry"
+              [attr.transform]="'rotate(' + o.rotation + ' ' + o.cx + ' ' + o.cy + ')'"
+            />
+            <circle class="sun" cx="0" cy="0" r="0.07" />
+            <circle class="apsis" [attr.cx]="o.perihelion.x" [attr.cy]="o.perihelion.y" r="0.035" />
+            <circle class="apsis" [attr.cx]="o.aphelion.x" [attr.cy]="o.aphelion.y" r="0.035" />
+            <text class="label" [attr.x]="o.perihelion.x + 0.06" [attr.y]="o.perihelion.y">
+              Perihelio
+            </text>
+            <text class="label" [attr.x]="o.aphelion.x + 0.06" [attr.y]="o.aphelion.y">Afelio</text>
+            <text class="label soft" x="0.72" y="-0.72">Tierra</text>
+            <text class="label soft" x="1.1" y="-1.1">Marte</text>
+          </svg>
+          <figcaption id="orbit-caption">
+            Órbita del Roadster (oro) sobre las órbitas de la Tierra y Marte, vista desde encima del
+            plano de la eclíptica. Se acerca al Sol hasta {{ au(r.periapsis_au) }} UA y se aleja
+            hasta {{ au(r.apoapsis_au) }} UA.
+          </figcaption>
+        </figure>
+      }
+
+      <div class="data">
+        <dl class="facts">
+          <div>
+            <dt>Distancia a la Tierra</dt>
+            <dd class="num">{{ r.earth_distance_km | distanceKm: units() }}</dd>
+          </div>
+          <div>
+            <dt>Distancia a Marte</dt>
+            <dd class="num">{{ r.mars_distance_km | distanceKm: units() }}</dd>
+          </div>
+          <div>
+            <dt>Velocidad respecto al Sol</dt>
+            <dd class="num">{{ r.speed_kph | speedKph: units() }}</dd>
+          </div>
+          <div>
+            <dt>Una vuelta al Sol</dt>
+            <dd class="num">{{ period() }} días</dd>
+          </div>
+          <div>
+            <dt>Excentricidad</dt>
+            <dd class="num">{{ au(r.eccentricity) }}</dd>
+          </div>
+          <div>
+            <dt>Inclinación</dt>
+            <dd class="num">{{ au(r.inclination) }}°</dd>
+          </div>
+          <div>
+            <dt>Masa al lanzamiento</dt>
+            <dd class="num">{{ launchMass() | mass: units() }}</dd>
+          </div>
+          @if (r.launch_date_utc) {
+            <div>
+              <dt>Lanzamiento</dt>
+              <dd>{{ r.launch_date_utc | date: 'mediumDate' : 'UTC' }}</dd>
+            </div>
+          }
+        </dl>
+        <p class="note">
+          Las distancias y la velocidad corresponden a la última actualización de la API, no al
+          momento actual.
+        </p>
+        @if (r.details) {
+          <p class="details">{{ r.details }}</p>
+        }
+        @if (wikipedia(); as w) {
+          <a [href]="w" target="_blank" rel="noopener"
+            >Leer en Wikipedia<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+          >
+        }
+      </div>
+    </div>
+  }
+</div>

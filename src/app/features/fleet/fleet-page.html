@@ -1,0 +1,93 @@
+<div class="page">
+  <header class="page-intro">
+    <h1>Flota de recuperación</h1>
+    <p>
+      Barcazas autónomas donde aterrizan los propulsores, barcos que pescan cofias del océano y
+      remolcadores que lo devuelven todo a puerto.
+    </p>
+  </header>
+
+  <app-resource-status [resource]="resource" subject="la flota" />
+
+  @if (ships().length) {
+    <div class="filters">
+      <fieldset>
+        <legend>Función</legend>
+        <div class="chips">
+          <label>
+            <input type="radio" value="all" [formField]="filters.role" />
+            <span>Todas</span>
+          </label>
+          @for (role of roles(); track role) {
+            <label>
+              <input type="radio" [value]="role" [formField]="filters.role" />
+              <span>{{ role }}</span>
+            </label>
+          }
+        </div>
+      </fieldset>
+      <label class="toggle">
+        <input type="checkbox" [formField]="filters.activeOnly" />
+        Solo en servicio
+      </label>
+    </div>
+
+    <p class="count" role="status">
+      {{ visible().length }} {{ visible().length === 1 ? 'barco' : 'barcos' }}
+    </p>
+
+    <ul class="grid">
+      @for (ship of visible(); track ship.id) {
+        <li class="ship">
+          <div class="media">
+            @if (ship.image) {
+              <img
+                [ngSrc]="ship.image"
+                fill
+                sizes="(width < 40rem) 100vw, 22rem"
+                [alt]="'Fotografía de ' + ship.name"
+              />
+            } @else {
+              <span class="no-image">Sin fotografía</span>
+            }
+            @if (!ship.active) {
+              <span class="retired">Fuera de servicio</span>
+            }
+          </div>
+          <div class="body">
+            <h2>{{ ship.name }}</h2>
+            <p class="roles">{{ ship.roles.join(', ') || ship.type }}</p>
+            <dl>
+              @if (ship.homePort) {
+                <div>
+                  <dt>Puerto base</dt>
+                  <dd>{{ ship.homePort }}</dd>
+                </div>
+              }
+              @if (ship.yearBuilt) {
+                <div>
+                  <dt>Construido</dt>
+                  <dd class="num">{{ ship.yearBuilt }}</dd>
+                </div>
+              }
+              <div>
+                <dt>Misiones</dt>
+                <dd class="num">{{ ship.missions }}</dd>
+              </div>
+              @if (ship.landings; as landings) {
+                <div>
+                  <dt>Aterrizajes</dt>
+                  <dd class="num">{{ landings.successful }} de {{ landings.attempted }}</dd>
+                </div>
+              }
+            </dl>
+          </div>
+        </li>
+      } @empty {
+        <li class="empty">
+          Ningún barco cumple ambos filtros. Desmarca «Solo en servicio» o elige otra función.
+        </li>
+      }
+    </ul>
+  }
+</div>

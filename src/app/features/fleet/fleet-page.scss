@@ -1,0 +1,164 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-s);
+  padding-block: var(--space-s);
+  border-block: 1px solid var(--line);
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  legend {
+    margin-block-end: var(--space-3xs);
+    padding: 0;
+    color: var(--titanium);
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+
+  label {
+    position: relative;
+  }
+
+  input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  span {
+    display: block;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--titanium);
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+
+  input:checked + span {
+    border-color: var(--frost);
+    background: var(--frost);
+    color: var(--sky-0);
+  }
+
+  input:focus-visible + span {
+    outline: var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-height: 2.75rem;
+  font-weight: 600;
+
+  input {
+    inline-size: 1.15rem;
+    block-size: 1.15rem;
+    accent-color: var(--foil-mark);
+  }
+}
+
+.count {
+  padding-block: var(--space-xs);
+  color: var(--titanium);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-l) var(--space-m);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ship {
+  display: grid;
+  align-content: start;
+  gap: var(--space-xs);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: var(--sky-2);
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.no-image {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  color: var(--titanium);
+  font-size: var(--step--1);
+}
+
+.retired {
+  position: absolute;
+  inset-inline-start: var(--space-2xs);
+  inset-block-start: var(--space-2xs);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-tag);
+  background: var(--sky-0);
+  color: var(--frost);
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+
+.body {
+  display: grid;
+  gap: var(--space-3xs);
+
+  h2 {
+    font-size: var(--step-1);
+  }
+}
+
+.roles {
+  color: var(--titanium);
+  font-size: var(--step--1);
+}
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2xs) var(--space-s);
+  margin-block-start: var(--space-2xs);
+
+  dt {
+    color: var(--titanium);
+    font-size: var(--step--1);
+  }
+
+  dd {
+    font-weight: 600;
+  }
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding-block: var(--space-xl);
+  color: var(--titanium);
+}

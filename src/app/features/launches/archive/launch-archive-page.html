@@ -1,0 +1,105 @@
+<div class="page">
+  <header class="page-intro">
+    <h1>Lanzamientos</h1>
+    <p>
+      El registro completo de vuelos de SpaceX. Filtra por año, vehículo o resultado; la dirección
+      de la página guarda tu búsqueda para que puedas compartirla.
+    </p>
+  </header>
+
+  <search class="filters" aria-label="Filtrar lanzamientos">
+    <div class="field query">
+      <label for="f-q">Buscar</label>
+      <input
+        id="f-q"
+        type="search"
+        placeholder="Misión, sitio u órbita"
+        autocomplete="off"
+        [formField]="filters.q"
+      />
+    </div>
+
+    <div class="field">
+      <label for="f-year">Año</label>
+      <select id="f-year" [formField]="filters.year">
+        <option value="">Todos</option>
+        @for (y of store.years(); track y) {
+          <option [value]="'' + y">{{ y }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="f-rocket">Cohete</label>
+      <select id="f-rocket" [formField]="filters.rocket">
+        <option value="all">Todos</option>
+        @for (r of store.rockets(); track r) {
+          <option [value]="r">{{ r }}</option>
+        }
+      </select>
+    </div>
+
+    <fieldset class="field outcome">
+      <legend>Resultado</legend>
+      <div class="segmented">
+        @for (o of outcomes; track o.value) {
+          <label>
+            <input type="radio" [value]="o.value" [formField]="filters.outcome" />
+            <span>{{ o.label }}</span>
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <label for="f-sort">Orden</label>
+      <select id="f-sort" [formField]="filters.sort">
+        <option value="newest">Más recientes</option>
+        <option value="oldest">Más antiguos</option>
+        <option value="heaviest">Mayor carga útil</option>
+      </select>
+    </div>
+  </search>
+
+  <div class="summary">
+    <p role="status" aria-live="polite">{{ announce() }}</p>
+    @if (hasFilters()) {
+      <button type="button" class="link" (click)="reset()">Quitar filtros</button>
+    }
+  </div>
+
+  <app-resource-status
+    [resource]="store.resource"
+    subject="los lanzamientos"
+    [rows]="[90, 90, 90, 90, 90, 90]"
+  />
+
+  @if (store.resource.hasValue()) {
+    @for (group of groups(); track group.year) {
+      <section class="group" [attr.aria-labelledby]="group.year ? 'y-' + group.year : null">
+        @if (group.year) {
+          <h2 class="year num" [id]="'y-' + group.year">{{ group.year }}</h2>
+        }
+        <ol class="log">
+          @for (launch of group.launches; track launch.id) {
+            <li><app-launch-row [launch]="launch" /></li>
+          }
+        </ol>
+      </section>
+    } @empty {
+      <div class="empty">
+        <h2>Ningún lanzamiento coincide</h2>
+        <p>Prueba con menos filtros o con otro término de búsqueda.</p>
+        <button type="button" class="button" (click)="reset()">Quitar filtros</button>
+      </div>
+    }
+
+    @if (visible().length < results().length) {
+      <div class="more">
+        <button type="button" class="button" (click)="showMore()">
+          Mostrar más ({{ results().length - visible().length }} restantes)
+        </button>
+      </div>
+    }
+  }
+</div>

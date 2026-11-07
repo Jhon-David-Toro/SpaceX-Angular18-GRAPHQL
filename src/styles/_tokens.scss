@@ -1,0 +1,73 @@
+// Design tokens. Colours come from the subject itself:
+// twilight sky at altitude, gold MLI thermal foil, RP-1 flame, LOX frost, titanium.
+// `light-dark()` swaps every token from the single `color-scheme` set on <html>.
+
+:root {
+  color-scheme: light dark;
+
+  // Surfaces
+  --sky-0: light-dark(#f2f4f7, #0f1c30);
+  --sky-1: light-dark(#ffffff, #16263f);
+  --sky-2: light-dark(#e6ebf2, #1e3150);
+  --line: light-dark(#c9d2de, #2d4468);
+  --line-strong: light-dark(#98a6b9, #46618a);
+
+  // Ink
+  --frost: light-dark(#13213a, #e6eef6);
+  --titanium: light-dark(#4a5a73, #a3b3c8);
+
+  // Signals — `*-ink` variants are safe for text on surfaces (WCAG AA).
+  --foil: #e8b65a;
+  // Marks and indicators (chart lines, active tabs): ≥3:1 against the surface (WCAG 1.4.11).
+  --foil-mark: light-dark(#a86e00, #e8b65a);
+  --foil-ink: light-dark(#7d5200, #f0c878);
+  --flame: light-dark(#c2410c, #ff8a5b);
+  --flame-ink: light-dark(#a8380a, #ffa27e);
+  --unknown: light-dark(#7c8aa0, #6f8099);
+  --on-foil: #1a1405;
+
+  // Type
+  --font: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --step--1: 0.833rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.563rem;
+  --step-3: 1.953rem;
+  --step-4: 2.441rem;
+  --step-5: clamp(2.441rem, 1.6rem + 3.6vw, 3.815rem);
+  --step-hero: clamp(3rem, 1.4rem + 7vw, 6.5rem);
+  --wide: 125%;
+  --semi-wide: 112%;
+  --narrow: 88%;
+
+  // Space (multiples of the 1.6 body leading)
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.8rem;
+  --space-s: 1.2rem;
+  --space-m: 1.6rem;
+  --space-l: 2.4rem;
+  --space-xl: 3.2rem;
+  --space-2xl: 4.8rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --content: 74rem;
+  --measure: 66ch;
+
+  // Shape: radius grows with the size of the object, never one value for everything.
+  --radius-tag: 2px;
+  --radius-control: 4px;
+  --radius-panel: 8px;
+  --radius-media: 14px;
+
+  --focus: 2px solid var(--foil-ink);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --header-h: 4rem;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}

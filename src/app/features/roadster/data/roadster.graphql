@@ -1,0 +1,25 @@
+query Roadster {
+  roadster {
+    name
+    details
+    launch_date_utc
+    launch_mass_kg
+    launch_mass_lbs
+    norad_id
+    apoapsis_au
+    periapsis_au
+    semi_major_axis_au
+    eccentricity
+    inclination
+    longitude
+    periapsis_arg
+    period_days
+    speed_kph
+    speed_mph
+    earth_distance_km
+    earth_distance_mi
+    mars_distance_km
+    mars_distance_mi
+    wikipedia
+  }
+}

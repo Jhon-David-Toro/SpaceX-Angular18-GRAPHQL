@@ -15,9 +15,13 @@ import { groupBy } from '../../../shared/util/collections';
 import { LaunchArchiveStore } from '../data/launch-archive.store';
 import type { LaunchCriteria } from '../data/launch-filters';
 import { criteriaFromParams, criteriaToParams, filterLaunches } from '../data/launch-filters';
+import { OUTCOME_FILTER_OPTIONS } from '../data/launch-outcomes.constants';
 import { LaunchRow } from '../ui/launch-row';
 
-/** Form model: native controls work with strings; criteria are parsed from it. */
+/**
+ * Form model for launch filters.
+ * Native form controls work with strings; these are parsed into LaunchCriteria.
+ */
 interface FilterForm {
   q: string;
   year: string;
@@ -26,8 +30,15 @@ interface FilterForm {
   sort: string;
 }
 
+/** Number of launches to show per page before "Show more" button */
 const PAGE_SIZE = 30;
 
+/**
+ * Converts typed LaunchCriteria to string-based FilterForm for native form controls.
+ *
+ * @param criteria - Parsed criteria object
+ * @returns Form model with all values as strings
+ */
 function toForm(criteria: LaunchCriteria): FilterForm {
   return {
     q: criteria.query,
@@ -65,9 +76,24 @@ export default class LaunchArchivePage {
     }),
   );
 
-  /** Last params this page wrote, so our own navigations don't overwrite what's being typed. */
+  /**
+   * Tracks the last query params this page wrote to the URL.
+   * Prevents our own navigations from overwriting values being typed in the form.
+   */
   private lastWritten = '';
 
+  /**
+   * Bidirectional form-criteria sync using linkedSignal.
+   *
+   * **How it works:**
+   * - Source: URL criteria (from query params)
+   * - Computation: Converts criteria → form values, BUT skips conversion if
+   *   the URL change came from us (checked via lastWritten), preventing
+   *   form values from being overwritten while the user is typing
+   * - The form's changes flow back through `criteria` computed → debounced effect → router
+   *
+   * This pattern allows seamless URL↔form sync without fighting user input.
+   */
   protected readonly model = linkedSignal<LaunchCriteria, FilterForm>({
     source: this.urlCriteria,
     computation: (criteria, previous) =>
@@ -101,11 +127,7 @@ export default class LaunchArchivePage {
     return query.trim() !== '' || year !== 0 || outcome !== 'all' || rocket !== 'all';
   });
 
-  protected readonly outcomes = [
-    { value: 'all', label: 'Todos' },
-    { value: 'success', label: 'Éxito' },
-    { value: 'failure', label: 'Fallo' },
-  ] as const;
+  protected readonly outcomes = OUTCOME_FILTER_OPTIONS;
 
   /** Debounced copy of the criteria, used only to keep the URL shareable. */
   private readonly debouncedCriteria = debounced(this.criteria, 350);

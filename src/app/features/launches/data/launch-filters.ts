@@ -1,18 +1,32 @@
 import { normalizeText } from '../../../shared/util/collections';
 import type { LaunchOutcome, LaunchSummary } from './launch.model';
 
+/**
+ * Outcome filter option including 'all' to show all outcomes.
+ */
 export type OutcomeFilter = 'all' | LaunchOutcome;
+
+/**
+ * Available sort orders for the launch archive.
+ */
 export type LaunchSort = 'newest' | 'oldest' | 'heaviest';
 
+/**
+ * Complete filter and sort criteria for the launch archive.
+ */
 export interface LaunchCriteria {
   readonly query: string;
-  /** `0` means every year (signal forms bind selects to primitives). */
+  /** Year to filter by. `0` means all years (signal forms bind selects to primitives). */
   readonly year: number;
   readonly outcome: OutcomeFilter;
+  /** Rocket name to filter by. 'all' means all rockets. */
   readonly rocket: string;
   readonly sort: LaunchSort;
 }
 
+/**
+ * Default criteria when no filters are applied.
+ */
 export const DEFAULT_CRITERIA: LaunchCriteria = {
   query: '',
   year: 0,
@@ -21,13 +35,23 @@ export const DEFAULT_CRITERIA: LaunchCriteria = {
   sort: 'newest',
 };
 
+/**
+ * Sort comparator functions for each LaunchSort option.
+ */
 const SORTERS: Record<LaunchSort, (a: LaunchSummary, b: LaunchSummary) => number> = {
   newest: (a, b) => b.timestamp - a.timestamp,
   oldest: (a, b) => a.timestamp - b.timestamp,
   heaviest: (a, b) => b.payloadMassKg - a.payloadMassKg,
 };
 
-/** Pure, allocation-light filtering so it can run on every keystroke inside a `computed`. */
+/**
+ * Filters and sorts launches based on criteria.
+ * Pure and allocation-light so it can run on every keystroke inside a `computed`.
+ *
+ * @param launches - Complete array of launches to filter
+ * @param criteria - Filter and sort criteria
+ * @returns Filtered and sorted array (new array, original unchanged)
+ */
 export function filterLaunches(
   launches: readonly LaunchSummary[],
   criteria: LaunchCriteria,
@@ -44,15 +68,35 @@ export function filterLaunches(
     .sort(SORTERS[criteria.sort]);
 }
 
+/**
+ * Type guard for OutcomeFilter values.
+ * Used to validate untrusted URL query params.
+ *
+ * @param value - Value to check
+ * @returns True if value is a valid OutcomeFilter
+ */
 export function isOutcomeFilter(value: unknown): value is OutcomeFilter {
   return value === 'all' || value === 'success' || value === 'failure' || value === 'unknown';
 }
 
+/**
+ * Type guard for LaunchSort values.
+ * Used to validate untrusted URL query params.
+ *
+ * @param value - Value to check
+ * @returns True if value is a valid LaunchSort
+ */
 export function isLaunchSort(value: unknown): value is LaunchSort {
   return value === 'newest' || value === 'oldest' || value === 'heaviest';
 }
 
-/** Builds criteria from untrusted URL query params. */
+/**
+ * Builds LaunchCriteria from untrusted URL query params.
+ * Validates and sanitizes all inputs, falling back to defaults for invalid values.
+ *
+ * @param params - URL query parameters (strings or undefined)
+ * @returns Valid LaunchCriteria object
+ */
 export function criteriaFromParams(params: {
   q?: string | undefined;
   year?: string | undefined;
@@ -70,7 +114,13 @@ export function criteriaFromParams(params: {
   };
 }
 
-/** Serialises criteria to query params, omitting defaults to keep URLs short and shareable. */
+/**
+ * Serializes LaunchCriteria to URL query params.
+ * Omits default values to keep URLs short and shareable.
+ *
+ * @param criteria - Criteria to serialize
+ * @returns Object mapping param names to values (null removes the param)
+ */
 export function criteriaToParams(criteria: LaunchCriteria): Record<string, string | null> {
   return {
     q: criteria.query.trim() || null,
@@ -81,10 +131,14 @@ export function criteriaToParams(criteria: LaunchCriteria): Record<string, strin
   };
 }
 
+/**
+ * Aggregate statistics computed from a set of launches.
+ */
 export interface ArchiveStats {
   readonly total: number;
   readonly successes: number;
   readonly failures: number;
+  /** Success rate as a decimal between 0 and 1 */
   readonly successRate: number;
   readonly firstYear: number | null;
   readonly lastYear: number | null;
@@ -92,6 +146,13 @@ export interface ArchiveStats {
   readonly busiestYear: { year: number; count: number } | null;
 }
 
+/**
+ * Computes aggregate statistics from an array of launches.
+ * Success rate excludes launches with unknown outcomes.
+ *
+ * @param launches - Array of launches to analyze
+ * @returns ArchiveStats object with computed metrics
+ */
 export function computeStats(launches: readonly LaunchSummary[]): ArchiveStats {
   const successes = launches.filter((l) => l.outcome === 'success').length;
   const failures = launches.filter((l) => l.outcome === 'failure').length;

@@ -14,16 +14,10 @@ import { ResourceStatus } from '../../../shared/ui/resource-status';
 import { VideoFacade } from '../../../shared/ui/video-facade';
 import { youtubeId } from '../../../shared/util/youtube';
 import { LaunchArchiveStore } from '../data/launch-archive.store';
+import { LANDING_TEXT } from '../data/launch-outcomes.constants';
 import { toLaunchDetail } from '../data/launch.model';
 
 type DetailTab = 'stage' | 'payload' | 'gallery';
-
-const LANDING_TEXT = {
-  success: 'Aterrizó',
-  failure: 'No aterrizó',
-  unknown: 'Sin dato',
-  none: 'Sin intento',
-} as const;
 
 @Component({
   selector: 'app-launch-detail-page',

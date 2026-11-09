@@ -1,0 +1,34 @@
+<div class="page">
+  <header class="page-intro">
+    <h1>Hitos</h1>
+    <p>Los momentos que cambiaron lo que se creía posible en un lanzamiento, en orden.</p>
+  </header>
+
+  <app-resource-status [resource]="resource" subject="los hitos" />
+
+  @if (milestones().length) {
+    <ol class="timeline">
+      @for (m of milestones(); track m.id) {
+        <li>
+          <time class="num" [attr.datetime]="m.date">{{ m.date | date: 'longDate' : 'UTC' }}</time>
+          <div class="event">
+            <h2>{{ m.title }}</h2>
+            @if (m.details) {
+              <p>{{ m.details }}</p>
+            }
+            <p class="links">
+              @if (m.flightId) {
+                <a [routerLink]="['/lanzamientos', m.flightId]">Ver la misión</a>
+              }
+              @if (m.article) {
+                <a [href]="m.article" target="_blank" rel="noopener"
+                  >Leer la noticia<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+                >
+              }
+            </p>
+          </div>
+        </li>
+      }
+    </ol>
+  }
+</div>

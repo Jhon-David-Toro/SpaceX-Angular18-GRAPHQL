@@ -6,14 +6,30 @@ import { Apollo } from 'apollo-angular';
 import { Kind } from 'graphql';
 import { map } from 'rxjs';
 
+/**
+ * Configuration options for creating a query resource.
+ *
+ * @template TData - Raw GraphQL response data type
+ * @template TVariables - GraphQL query variables type
+ * @template TResult - Transformed domain model type
+ */
 export interface QueryResourceOptions<TData, TVariables extends OperationVariables, TResult> {
-  /** Reactive variables. Returning `undefined` keeps the resource idle. */
+  /**
+   * Optional reactive variables function.
+   * Returning `undefined` keeps the resource idle (won't execute the query).
+   */
   readonly variables?: () => TVariables | undefined;
-  /** Maps the raw GraphQL payload into a domain model. */
+  /**
+   * Transforms raw GraphQL payload into a domain model.
+   * Called with the response data when the query succeeds.
+   */
   readonly select: (data: TData) => TResult;
 }
 
-/** Raised when the API answers without data (e.g. the entity does not exist). */
+/**
+ * Error thrown when the GraphQL API returns a successful response without data.
+ * This typically indicates the requested entity does not exist.
+ */
 export class EmptyResponseError extends Error {
   constructor(operation: string) {
     super(`La operación ${operation} no devolvió datos.`);
@@ -21,6 +37,12 @@ export class EmptyResponseError extends Error {
   }
 }
 
+/**
+ * Extracts the operation name from a GraphQL document for error messages.
+ *
+ * @param document - GraphQL document node
+ * @returns Operation name or 'anónima' if not found
+ */
 function operationName(document: DocumentNode): string {
   const definition = document.definitions[0];
   return definition?.kind === Kind.OPERATION_DEFINITION
@@ -29,9 +51,27 @@ function operationName(document: DocumentNode): string {
 }
 
 /**
- * Bridges Apollo with Angular's signal-based `resource` API: status, value and error are signals,
- * and changing `variables` cancels the in-flight request automatically.
- * Must be called in an injection context.
+ * Bridges Apollo Client with Angular's signal-based resource API.
+ *
+ * Creates a resource where status, value, and error are reactive signals.
+ * Changing variables automatically cancels in-flight requests and triggers a new query.
+ * Integrates with Apollo's cache, so identical queries return cached data instantly.
+ *
+ * **Usage:**
+ * ```typescript
+ * const resource = queryResource(LaunchesDocument, {
+ *   select: toLaunchArchive
+ * });
+ * // Access: resource.status(), resource.value(), resource.error(), resource.hasValue()
+ * ```
+ *
+ * @template TData - Raw GraphQL response data type
+ * @template TVariables - GraphQL query variables type
+ * @template TResult - Transformed domain model type
+ * @param document - TypedDocumentNode for the GraphQL query
+ * @param options - Configuration with select transformer and optional variables
+ * @returns ResourceRef with reactive status, value, and error signals
+ * @throws EmptyResponseError if the API returns success without data
  */
 export function queryResource<TData, TVariables extends OperationVariables, TResult>(
   document: TypedDocumentNode<TData, TVariables>,
@@ -55,7 +95,24 @@ export function queryResource<TData, TVariables extends OperationVariables, TRes
   });
 }
 
-/** Use inside `select` to turn a missing entity into a "not found" error state. */
+/**
+ * Utility for use inside `select` to turn a missing entity into an error state.
+ * Throws EmptyResponseError if the value is null or undefined, otherwise returns it.
+ *
+ * **Example:**
+ * ```typescript
+ * queryResource(LaunchDetailDocument, {
+ *   variables: () => ({ id: launchId() }),
+ *   select: (data) => required(toLaunchDetail(data), 'launch detail')
+ * })
+ * ```
+ *
+ * @template T - Type of the required value
+ * @param value - Value to check
+ * @param what - Description for the error message (e.g., 'launch detail')
+ * @returns The value if not null/undefined
+ * @throws EmptyResponseError if value is null or undefined
+ */
 export function required<T>(value: T | null | undefined, what: string): T {
   if (value === null || value === undefined) {
     throw new EmptyResponseError(what);

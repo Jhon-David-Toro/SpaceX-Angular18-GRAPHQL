@@ -1,13 +1,20 @@
 import type { RocketsQuery } from '../../../core/graphql/generated/graphql';
 import type { Measure } from '../../../shared/format/measure';
 import { compact, secureUrl } from '../../../shared/util/collections';
+import { LINEUP_HEIGHT, ORBIT_NAMES, STATUE_OF_LIBERTY_M } from './rocket.constants';
 
+/**
+ * Payload capacity for a specific orbital destination.
+ */
 export interface PayloadCapacity {
   readonly id: string;
   readonly name: string;
   readonly mass: Measure;
 }
 
+/**
+ * Complete rocket specifications and capabilities.
+ */
 export interface RocketModel {
   readonly id: string;
   readonly name: string;
@@ -17,7 +24,7 @@ export interface RocketModel {
   readonly stages: number | null;
   readonly boosters: number | null;
   readonly costPerLaunch: number | null;
-  /** 0–1 */
+  /** Success rate as a decimal between 0 and 1 */
   readonly successRate: number | null;
   readonly firstFlight: string | null;
   readonly country: string | null;
@@ -33,16 +40,29 @@ export interface RocketModel {
   readonly capacities: readonly PayloadCapacity[];
 }
 
+/**
+ * SVG silhouette data for rendering a rocket to scale.
+ */
+export interface Silhouette {
+  readonly id: string;
+  readonly x: number;
+  readonly width: number;
+  readonly height: number;
+  readonly path: string;
+}
+
 type RawRocket = NonNullable<NonNullable<RocketsQuery['rockets']>[number]>;
 
-const ORBIT_NAMES: Record<string, string> = {
-  leo: 'Órbita baja (LEO)',
-  gto: 'Transferencia geoestacionaria (GTO)',
-  mars: 'Marte',
-  moon: 'Luna',
-  pluto: 'Plutón',
-};
+// Re-export constants for backward compatibility
+export { LINEUP_HEIGHT, STATUE_OF_LIBERTY_M };
 
+/**
+ * Transforms a raw rocket from the GraphQL API into our domain model.
+ * Normalizes engine names, converts success rate to decimal, and maps payload capacities.
+ *
+ * @param raw - Raw rocket data from the RocketsQuery
+ * @returns RocketModel object or null if required fields are missing
+ */
 export function toRocket(raw: RawRocket): RocketModel | null {
   if (!raw.id || !raw.name) {
     return null;
@@ -87,26 +107,35 @@ export function toRocket(raw: RawRocket): RocketModel | null {
   };
 }
 
-/** Oldest first, which is also smallest to largest for SpaceX's line-up. */
+/**
+ * Transforms the complete rockets GraphQL query into an array of rocket models.
+ * Sorts by first flight date (oldest first), which for SpaceX also orders by size.
+ *
+ * @param data - Complete RocketsQuery result
+ * @returns Sorted array of RocketModel objects
+ */
 export function toRockets(data: RocketsQuery): RocketModel[] {
   return compact(compact(data.rockets).map(toRocket)).sort((a, b) =>
     (a.firstFlight ?? '9999').localeCompare(b.firstFlight ?? '9999'),
   );
 }
 
-export interface Silhouette {
-  readonly id: string;
-  readonly x: number;
-  readonly width: number;
-  readonly height: number;
-  readonly path: string;
-}
-
-export const LINEUP_HEIGHT = 300;
-/** Reference structure drawn behind the rockets. */
-export const STATUE_OF_LIBERTY_M = 93;
-
-/** True-to-scale outlines: body plus a nose cone, laid out left to right on one baseline. */
+/**
+ * Generates true-to-scale SVG silhouettes for a lineup of rockets.
+ * Each rocket is drawn as a cylindrical body with a parabolic nose cone,
+ * positioned left-to-right on a shared baseline. The scale is normalized
+ * so the tallest rocket (or Statue of Liberty reference) fits within LINEUP_HEIGHT.
+ *
+ * **Algorithm:**
+ * - Height is proportional to the rocket's actual height in meters
+ * - Nose cone height is 12% of total height (capped at 2.4× diameter for proportions)
+ * - Width is proportional to diameter (minimum 4 units for visibility)
+ * - All rockets share a common baseline at the bottom of the viewport
+ *
+ * @param rockets - Array of rockets to layout
+ * @param width - Total viewport width in SVG units
+ * @returns Object containing silhouette paths and the meters-to-units scale factor
+ */
 export function layoutSilhouettes(
   rockets: readonly RocketModel[],
   width: number,

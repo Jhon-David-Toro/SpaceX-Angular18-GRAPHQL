@@ -1,11 +1,6 @@
 import { Component, computed, input } from '@angular/core';
+import { OUTCOME_LABELS } from '../../features/launches/data/launch-outcomes.constants';
 import type { LaunchOutcome } from '../../features/launches/data/launch.model';
-
-const LABELS: Record<LaunchOutcome, string> = {
-  success: 'Éxito',
-  failure: 'Fallo',
-  unknown: 'Sin dato',
-};
 
 /** Outcome is conveyed by text and shape, never by colour alone. */
 @Component({
@@ -50,5 +45,5 @@ const LABELS: Record<LaunchOutcome, string> = {
 })
 export class OutcomeBadge {
   readonly outcome = input.required<LaunchOutcome>();
-  protected readonly label = computed(() => LABELS[this.outcome()]);
+  protected readonly label = computed(() => OUTCOME_LABELS[this.outcome()]);
 }

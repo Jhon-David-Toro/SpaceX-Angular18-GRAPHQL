@@ -49,6 +49,7 @@
     "@vitest/coverage-v8": "^5.1.0",
     "angular-eslint": "22.6.0",
     "eslint": "^10.12.0",
+    "eslint-plugin-complexity": "^1.0.2",
     "husky": "^9.1.7",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",

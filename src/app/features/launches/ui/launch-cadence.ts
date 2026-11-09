@@ -5,9 +5,8 @@ import { Preferences } from '../../../core/preferences/preferences';
 import { formatMass, massFromKg } from '../../../shared/format/measure';
 import { OutcomeBadge } from '../../../shared/ui/outcome-badge';
 import type { LaunchSummary } from '../data/launch.model';
+import { OUTCOME_TEXT } from '../data/launch-outcomes.constants';
 import { CADENCE_HEIGHT, CADENCE_WIDTH, layoutCadence, nearestTick } from './cadence-layout';
-
-const OUTCOME_TEXT = { success: 'éxito', failure: 'fallo', unknown: 'resultado sin dato' } as const;
 
 /**
  * Every launch as one vertical line on a time axis.
